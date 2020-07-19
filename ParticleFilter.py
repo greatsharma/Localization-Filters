@@ -57,9 +57,9 @@ class Robot():
 
     def move(self, turn, forward):
         if forward < 0.:
-            raise ValueError('robot cannot move backwards')
+            raise ValueError('forward cannot be negative, to move a robot 2 units backward, set forward=2 and turn=pi')
         if turn < -2*pi or turn > 2*pi:
-            raise ValueError('orientation should be between [-2pi...2pi]')
+            raise ValueError('orientation should be between [-2pi,2pi]')
 
         self.orientation += turn + random.gauss(0.0, self.turn_noise)
         self.orientation %= 2*pi
