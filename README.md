@@ -1,3 +1,3 @@
 # Localization-Filters
 
-An python implementation of popular filters.
+Python implementation of popular filters.
