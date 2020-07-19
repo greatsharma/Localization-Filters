@@ -12,8 +12,8 @@ def sense(world, prior, measurement, pSense):
     assert world.shape == prior.shape, "world and prior should have same shape"
     validate_dist(prior)
 
-    assert (0.0 <= pSense <= 1.0),
-    "measurement sense probability should be in range [0.0, 1.0]"
+    assert (0.0 <= pSense <= 1.0), \
+        "measurement sense probability should be in range [0.0, 1.0]"
 
     posterior = np.zeros_like(prior)
     for i in range(world.shape[0]):
@@ -55,8 +55,8 @@ def move(prior, motion, motionKernel):
 
 # localization is a repeated cycle of sense and move.
 def apply_histrogram_filter(world, prior, measurements, motions, pSense, motionKernel):
-    assert len(measurements) == len(motions),
-    "number of measurements and motions should be same"
+    assert len(measurements) == len(motions), \
+        "number of measurements and motions should be same"
 
     prob = prior.copy()
     for measure, mov in zip(measurements, motions):
