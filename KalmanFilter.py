@@ -23,14 +23,18 @@ def predict_position(mu_x, sig_x, mu_y, sig_y):
 
 def kalman_position_estimation(measurements, motions, measure_sigma, motion_sigma, mu_i, sig_i):
     dim = len(mu_i)
-    assert len(measurements) == len(
-        motions), 'number of measurements and motions should be same'
-    assert len(
-        sig_i) == dim, 'intial mean and sigma should be of length number of dimensions'
-    assert len(
-        measure_sigma) == dim, 'measurement sigma should be of length number of dimensions'
-    assert len(
-        motion_sigma) == dim, 'motion sigma should be of length number of dimensions'
+
+    assert len(measurements) == len(motions), \
+        'number of measurements and motions should be same'
+
+    assert len(sig_i) == dim, \
+        'intial mean and sigma should be of length number of dimensions'
+
+    assert len(measure_sigma) == dim, \
+        'measurement sigma should be of length number of dimensions'
+
+    assert len(motion_sigma) == dim, \
+        'motion sigma should be of length number of dimensions'
 
     mu = np.matrix(mu_i).T
     sig = np.matrix(sig_i).T
@@ -47,16 +51,21 @@ def kalman_position_estimation(measurements, motions, measure_sigma, motion_sigm
 
 def kalman_state_estimation(measurements, pos_i, u, P, F, H, R):
     dim = len(pos_i)
-    assert P.shape[0] == P.shape[1] == 2 * \
-        dim, 'uncertainity matrix P should be of shape (2*dim, 2*dim)'
-    assert F.shape[0] == F.shape[1] == 2 * \
-        dim, 'state transition matrix F should be of shape (2*dim, 2*dim)'
-    assert R.shape[0] == R.shape[
-        1] == dim, 'measurement noise matrix R should be of shape (dim, dim)'
-    assert H.shape == (
-        dim, 2*dim), 'measurement function matrix H should be of shape (1, 2*dim)'
-    assert u.shape == (
-        2*dim, 1), 'external motion vector u should be of shape (2*dim, 1)'
+
+    assert P.shape[0] == P.shape[1] == 2 * dim, \
+        'uncertainity matrix P should be of shape (2*dim, 2*dim)'
+
+    assert F.shape[0] == F.shape[1] == 2 * dim, \
+        'state transition matrix F should be of shape (2*dim, 2*dim)'
+
+    assert R.shape[0] == R.shape[1] == dim, \
+        'measurement noise matrix R should be of shape (dim, dim)'
+
+    assert H.shape == (dim, 2*dim), \
+        'measurement function matrix H should be of shape (1, 2*dim)'
+
+    assert u.shape == (2*dim, 1), \
+        'external motion vector u should be of shape (2*dim, 1)'
 
     x = np.zeros((2*dim, 1))
     for ind in range(x.shape[0]//2):
@@ -80,17 +89,19 @@ def kalman_state_estimation(measurements, pos_i, u, P, F, H, R):
 
 
 if __name__ == '__main__':
-    # estimate 1D position
+    print("\n\nestimate 1D position: \n")
     measurements = np.array([[1.], [2.], [3.]])
     motions = np.array([[1], [1], [1]])
     measure_sigma = [1.]
     motion_sigma = [0.]
     mu_i = [0.]
     sig_i = [1000.]
-    print(kalman_position_estimation(measurements, motions,
-                                     measure_sigma, motion_sigma, mu_i, sig_i))
+    pos_mu, pos_sig = kalman_position_estimation(measurements, motions,
+                                                 measure_sigma, motion_sigma, mu_i, sig_i)
+    print(
+        f"position estimate: {pos_mu}\nuncertanity in position estimate: {pos_sig}")
 
-    # 2D position estimation
+    print("\n\nestimate 2D position: \n")
     measurements = np.array([[5., 10.], [6., 8.], [7., 6.],
                              [8., 4.], [9., 2.], [10., 0.]])
     motions = np.array([[1, -2], [1, -2], [1, -2], [1, -2], [1, -2], [1, -2]])
@@ -98,10 +109,13 @@ if __name__ == '__main__':
     motion_sigma = [0., 0.]
     mu_i = [4., 12.]
     sig_i = [0., 0.]
-    print(kalman_position_estimation(measurements, motions,
-                                     measure_sigma, motion_sigma, mu_i, sig_i))
+    pos_mu, pos_sig = kalman_position_estimation(measurements, motions,
+                                                 measure_sigma, motion_sigma, mu_i, sig_i)
+    print(
+        f"position estimate: {pos_mu}\nuncertanity in position estimate: {pos_sig}")
 
-    # 1D motion state estimation
+    # motion state consists both position as well as speed
+    print("\n\n1D motion state estimation: \n")
     measurements = np.array([[1], [2], [3]])
     dt = 1.
     pos_i = [0.]  # initial x position
@@ -111,9 +125,12 @@ if __name__ == '__main__':
     F = np.matrix([[1., dt], [0., 1.]])  # state transition matrix
     H = np.matrix([[1., 0.]])  # measurement function matrix
     R = np.matrix([[1.]])  # measurement noise
-    print(kalman_state_estimation(measurements, pos_i, u, P, F, H, R))
+    state_mat, uncertain_mat = kalman_state_estimation(
+        measurements, pos_i, u, P, F, H, R)
+    print(
+        f"state estimation: {state_mat}\nuncertanity in estimation: {uncertain_mat}")
 
-    # 2D motion state estimation
+    print("\n\n2D motion state estimation: \n")
     measurements = np.array([[5., 10.], [6., 8.], [7., 6.],
                              [8., 4.], [9., 2.], [10., 0.]])
     dt = 1.
@@ -132,4 +149,7 @@ if __name__ == '__main__':
                    [0., 1., 0., 0.]])
     R = np.matrix([[0.1, 0.],
                    [0., 0.1]])
-    print(kalman_state_estimation(measurements, pos_i, u, P, F, H, R))
+    state_mat, uncertain_mat = kalman_state_estimation(
+        measurements, pos_i, u, P, F, H, R)
+    print(
+        f"state estimation: {state_mat}\nuncertanity in estimation: {uncertain_mat}")

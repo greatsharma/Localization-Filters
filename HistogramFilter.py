@@ -9,9 +9,11 @@ from utils import validate_dist, convolution
 # sense gains information hence decreases entropy, sense is just a product.
 # sense calculates the change in prior due to the measurement using bayesian inference.
 def sense(world, prior, measurement, pSense):
-    assert world.shape == prior.shape, 'world and prior should have same shape'
+    assert world.shape == prior.shape, "world and prior should have same shape"
     validate_dist(prior)
-    assert 0.0 <= pSense <= 1.0, 'measurement sense probability should be in range [0.0, 1.0]'
+
+    assert (0.0 <= pSense <= 1.0),
+    "measurement sense probability should be in range [0.0, 1.0]"
 
     posterior = np.zeros_like(prior)
     for i in range(world.shape[0]):
@@ -22,7 +24,7 @@ def sense(world, prior, measurement, pSense):
                 posterior[i][j] = prior[i][j] * (1.0 - pSense)
 
     normalizer = np.sum(posterior)
-    posterior = np.asarray(list(map(lambda x: x/normalizer, posterior)))
+    posterior = np.asarray(list(map(lambda x: x / normalizer, posterior)))
 
     return posterior
 
@@ -46,15 +48,15 @@ def move(prior, motion, motionKernel):
     elif np.array_equal(motion, [-1, 0]):
         posterior = convolution(prior, np.rot90(motionKernel, k=1))
     else:
-        raise Exception('Invalid motion command {}'.format(motion))
+        raise Exception("Invalid motion command {}".format(motion))
 
     return posterior
 
 
 # localization is a repeated cycle of sense and move.
 def apply_histrogram_filter(world, prior, measurements, motions, pSense, motionKernel):
-    assert len(measurements) == len(
-        motions), 'number of measurements and motions should be same'
+    assert len(measurements) == len(motions),
+    "number of measurements and motions should be same"
 
     prob = prior.copy()
     for measure, mov in zip(measurements, motions):
@@ -64,21 +66,35 @@ def apply_histrogram_filter(world, prior, measurements, motions, pSense, motionK
     return prob
 
 
-if __name__ == '__main__':
-    world = np.full((4, 5), 'r')
-    world[0][1], world[0, 2], world[1][2], world[2][2], world[2][3] = ('g') * 5
-    prior = np.full(world.shape, 1.0/(world.shape[0]*world.shape[1]))
-    measurements = ['g'] * 5
-    motions = np.array([[0, 0], [0, 1], [-1, 0], [-1, 0], [0, 1]])
-    pSense = 0.7
-    motionKernel = np.array([[0.0] * 5,
-                             [0.0, 0.005, 0.05, 0.10, 0.005],
-                             [0.0, 0.01, 0.03, 0.55, 0.09],
-                             [0.0, 0.005, 0.05, 0.10, 0.005],
-                             [0.0] * 5])
+if __name__ == "__main__":
+    world = np.full((4, 5), "r")
+    world[0][1], world[0, 2], world[1][2], world[2][2], world[2][3] = ("g") * 5
+    print("\nworld: \n", world)
 
-    print('\nworld: \n', world)
-    print('\nprior: \n', prior)
+    prior = np.full(world.shape, 1.0 / (world.shape[0] * world.shape[1]))
+    print("\nprior: \n", prior)
+
+    measurements = ["g"] * 5
+    print("\nmeasurements: ", measurements)
+
+    motions = np.array([[0, 0], [0, 1], [-1, 0], [-1, 0], [0, 1]])
+    print("\nmotions: ", motions)
+
+    pSense = 0.7
+    motionKernel = np.array(
+        [
+            [0.0] * 5,
+            [0.0, 0.005, 0.05, 0.10, 0.005],
+            [0.0, 0.01, 0.03, 0.55, 0.09],
+            [0.0, 0.005, 0.05, 0.10, 0.005],
+            [0.0] * 5,
+        ]
+    )
+
+    print("\npSense: ", pSense)
+    print("\nmotion kernel: \n", motionKernel)
+
     posterior = apply_histrogram_filter(
-        world, prior, measurements, motions, pSense, motionKernel)
-    print('\nposterior: \n', posterior)
+        world, prior, measurements, motions, pSense, motionKernel
+    )
+    print("\nposterior: \n", posterior)

@@ -57,7 +57,8 @@ class Robot():
 
     def move(self, turn, forward):
         if forward < 0.:
-            raise ValueError('forward cannot be negative, to move a robot 2 units backward, set forward=2 and turn=pi')
+            raise ValueError(
+                'forward cannot be negative, to move a robot 2 units backward, set forward=2 and turn=pi')
         if turn < -2*pi or turn > 2*pi:
             raise ValueError('orientation should be between [-2pi,2pi]')
 
@@ -161,6 +162,6 @@ def apply_particle_filter(map, landmarks, n_particles, n_iter):
 if __name__ == '__main__':
     map = [100, 100]
     landmarks = [[20., 20.], [80., 80], [20., 80.], [80., 20.]]
-    robot, particles = apply_particle_filter(map, landmarks, 1000, 10)
+    robot, particles = apply_particle_filter(map, landmarks, 1000, 100)
 
     print(eval(robot, particles, map))
