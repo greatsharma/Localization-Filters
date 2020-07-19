@@ -44,19 +44,3 @@ def convolution(matrix, kernel, padding=True):
             conv_matrix[i][j] = np.sum(np.multiply(matrix[i:(i + 2*pad + 1), j:(j + 2*pad + 1)], kernel))
 
     return conv_matrix
-
-
-def random_wheel(population, weights, k):
-    p = []
-    pop_size = len(population)
-    index = int(random.random() * pop_size)
-    beta = 0.
-    mw = max(weights)
-    for i in range(k):
-        beta += random.random() * 2. * mw
-        while beta > weights[index]:
-            beta -= weights[index]
-            index = (index + 1) % pop_size
-        p.append(population[index])
-
-    return p
